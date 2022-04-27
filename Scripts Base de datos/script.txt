@@ -1,0 +1,78 @@
+/* Borrar tablas por si existen */
+drop table usuarioxproyecto;
+drop table rol;
+drop table proyecto;
+drop table usuario;
+drop table membresia;
+
+/* Creacion de tablas */
+create table membresia(
+	idmembresia int primary key,
+    tipo varchar(40),
+    limite_almacenamiento int
+);
+
+create table usuario(
+	uid int PRIMARY KEY,
+	username varchar(50),
+	email varchar(30),
+	contrasena varchar(30),
+	idmembresia int,
+	FOREIGN KEY(idmembresia) REFERENCES membresia(idmembresia)
+);
+
+create table proyecto(
+	id_proyecto int primary key,
+    nombre varchar(100),
+    descripcion varchar(200),
+    limite_almacenamiento int,
+    limite_archivos int,
+    fecha date
+);
+
+create table rol(
+	idrol int primary key,
+    nombre varchar(30),
+    descripcion varchar(200)
+);
+
+create table usuarioxproyecto(
+	uid int,
+    id_proyecto int,
+    idrol int,
+    FOREIGN KEY(uid) REFERENCES usuario(uid),
+    FOREIGN KEY(id_proyecto) REFERENCES proyecto(id_proyecto),
+    FOREIGN KEY(idrol) REFERENCES rol(idrol)
+);
+
+/* Inserciones en tablas */
+insert into membresia values(1, "prueba", 10);
+insert into membresia values(2, "comercial", 100);
+insert into membresia values(3, "comercial", 1000);
+
+insert into usuario values(1, "fabian", "fabian@gmail.com", "123456", 1);
+insert into usuario values(2, "andreiton", "andreiton@gmail.com", "123456", 2);
+insert into usuario values(3, "william", "william@gmail.com", "123456", 3);
+
+insert into proyecto values(1, "fotos", "album de fotos", 1000, 1000, "2022-04-19");
+insert into proyecto values(2, "videos", "viaje miami", 1000, 1000, "2021-12-15");
+insert into proyecto values(3, "ids", "ids musicales", 1000, 100, "2020-03-20");
+
+insert into rol values(1, "Administrador", "Gestiona permisos, archivos, limitaciones e informacion del proyecto");
+insert into rol values(2, "Editor", "Permite editar los archivos del proyecto");
+insert into rol values(3, "Espectador", "Permite visualizar los archivos del proyecto");
+
+insert into usuarioxproyecto values(1,1,1);
+insert into usuarioxproyecto values(2,2,2);
+insert into usuarioxproyecto values(3,3,3);
+
+/* Consultas */
+select * from membresia;
+select * from usuario;
+select * from rol;
+select * from proyecto;
+select * from usuarioxproyecto;
+
+select u.username, p.nombre, r.nombre
+from usuario u, proyecto p, usuarioxproyecto s, rol r
+where u.uid = s.uid and p.id_proyecto = s.id_proyecto and r.idrol = s.idrol
