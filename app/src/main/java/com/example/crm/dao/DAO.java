@@ -3,13 +3,15 @@ package com.example.crm.dao;
 import android.os.StrictMode;
 import android.util.Log;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import com.example.crm.modelo.Usuario;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DAO {
     String gURL = "jdbc:mysql://";
@@ -18,7 +20,8 @@ public class DAO {
     String gDATABASE = "patrones";
     String gUSR = "Rojax10";
     String gPSW = "rojax10";
-    String resultado = "";
+
+    List< Usuario > usuarios;
 
     public Connection CONN()
     {
@@ -41,9 +44,9 @@ public class DAO {
         return conn;
     }
 
-    private String Query_Version()
+    private List<Usuario> getUsuarios( )
     {
-        String response = "";
+        this.usuarios = new ArrayList<>();
 
         try {
             Connection ConnexionMySQL = CONN();
@@ -53,28 +56,28 @@ public class DAO {
             //ResultSet rs = st.executeQuery("SHOW VARIABLES LIKE \"%version%\"");
 
             while (rs.next()) {
-                response += rs.getString(1) + " - " + rs.getString(2) + " - " + rs.getString(3)
-                        + " - " + rs.getString(4) + " - " + rs.getString(5) + "\n";
+                this.usuarios.add( new Usuario( rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getInt(5) ) );
+                /*response += rs.getString(1) + " - " + rs.getString(2) + " - " + rs.getString(3)
+                        + " - " + rs.getString(4) + " - " + rs.getString(5) + "\n";*/
             }
             rs.close();
             ConnexionMySQL.close();
 
         } catch (Exception e) {
             e.printStackTrace();
-
         }
-        return response;
+
+        return this.usuarios;
     }
 
-    public String DoOnThread()
+    public List<Usuario> DoOnThread()
     {
         Thread thread = new Thread() {
             @Override
             public void run()
             {
-                String mResult = Query_Version();
-                Log.e("MYSQL Version", mResult);
-                resultado = mResult;
+                getUsuarios();
+                //resultado = mResult;
             }
         };
         thread.start();
@@ -83,6 +86,6 @@ public class DAO {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return resultado;
+        return this.usuarios;
     }
 }
